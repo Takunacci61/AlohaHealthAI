@@ -3,3 +3,5 @@ venv
 *.pyc
 backend/db.sqlite3
 backend/backend/.env
+backend/accounts/migrations
+backend/clients/migrations
