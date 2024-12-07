@@ -1,0 +1,5 @@
+venv
+.idea
+*.pyc
+backend/db.sqlite3
+backend/backend/.env
