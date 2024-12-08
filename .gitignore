@@ -6,5 +6,4 @@ backend/backend/.env
 backend/accounts/migrations
 backend/clients/migrations
 backend/.env
-backend/nginx.conf
 frontend
