@@ -2,7 +2,12 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserProfile
-from .serializers import UserProfileSerializer
+from .serializers import UserProfileSerializer, CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class UserProfileView(APIView):
     permission_classes = [permissions.IsAuthenticated]

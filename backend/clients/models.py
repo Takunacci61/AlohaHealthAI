@@ -76,6 +76,7 @@ class ClientNote(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, help_text="The care worker who created this note.")
     created_at = models.DateTimeField(default=now, editable=False, help_text="Timestamp when the note was created.")
     note_text = models.TextField(help_text="The content of the care note.")
+    ai_evaluated_notes = models.TextField(blank=True, null=True, help_text="The AI evaluated notes.")
     sentiment = models.CharField(max_length=20, choices=NoteSentimentChoices.choices, default=NoteSentimentChoices.UNCATEGORISED, help_text="The sentiment of the note (e.g., Positive, Neutral, Negative, Uncategorised).")
     emotion_tags = models.JSONField(blank=True, null=True, help_text="Tags for emotions detected in the note (e.g., {'happiness': 0.8, 'anxiety': 0.2}).")
 
