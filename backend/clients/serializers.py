@@ -49,7 +49,7 @@ class ClientNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientNote
         fields = '__all__'
-        read_only_fields = ['sentiment', 'emotion_tags', 'created_at', 'created_by']
+        read_only_fields = ['sentiment', 'emotion_tags','ai_evaluated_notes', 'created_at', 'created_by']
 
     def analyze_sentiment(self, note_text):
         openai.api_key = settings.OPEN_AI_API
@@ -156,6 +156,32 @@ class ClientNoteSerializer(serializers.ModelSerializer):
             logger.error(f"Emotion analysis error: {str(e)}", exc_info=True)
             return {}
 
+    def evaluate_for_safeguarding(self, note_text):
+        openai.api_key = settings.OPEN_AI_API
+
+        prompt = (
+            "You are acting as a safeguarding officer. Read the following care note carefully and "
+            "identify all potential risks to the patient’s well-being, such as signs of abuse, neglect, "
+            "self-harm, unmet care needs, or environmental hazards. Then provide a list of suggestions "
+            "for safeguarding actions that could be taken to protect the patient. "
+            "Present your answer in plain text, clearly separating the identified risks and the suggested "
+            "safeguarding measures.\n\n"
+            f"Care Note: \"{note_text}\""
+        )
+
+        try:
+            completion = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0
+            )
+
+            safeguarding_response = completion.choices[0].message.content.strip()
+            return safeguarding_response
+        except Exception as e:
+            logger.error(f"Safeguarding analysis error: {str(e)}", exc_info=True)
+            return "Unable to analyze safeguarding risks at this time."
+
     def create(self, validated_data):
         request = self.context.get('request')
         if request and hasattr(request, 'user') and request.user.is_authenticated:
@@ -163,6 +189,7 @@ class ClientNoteSerializer(serializers.ModelSerializer):
 
         note_text = validated_data.get('note_text', '')
         validated_data['sentiment'] = self.analyze_sentiment(note_text)
+        validated_data['ai_evaluated_notes'] = self.evaluate_for_safeguarding(note_text)
         validated_data['emotion_tags'] = self.analyze_emotions(note_text)
         return super().create(validated_data)
 
@@ -171,5 +198,8 @@ class ClientNoteSerializer(serializers.ModelSerializer):
             note_text = validated_data['note_text']
             instance.sentiment = self.analyze_sentiment(note_text)
             instance.emotion_tags = self.analyze_emotions(note_text)
+            instance.ai_evaluated_notes = self.evaluate_for_safeguarding(note_text)
+
+
         return super().update(instance, validated_data)
 
