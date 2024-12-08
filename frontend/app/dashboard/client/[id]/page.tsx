@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { isAuthenticated } from '@/services/auth';
@@ -48,9 +48,18 @@ interface Note {
   created_at: string;
   note_text: string;
   sentiment: string;
-  emotion_tags: Record<string, any>;
+  emotion_tags: Record<string, number>;
   care_client: number;
   created_by: number;
+}
+
+interface PageParams {
+  id: string;
+}
+
+interface PageProps {
+  params: PageParams;
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 const NotesTable = ({ notes }: { notes: Note[] }) => {
@@ -391,7 +400,7 @@ const SentimentAnalysis = ({ clientId }: { clientId: number }) => {
         y: {
           beginAtZero: true,
           ticks: {
-            callback: function(value: any) {
+            callback: function(value: number) {
               return value.toFixed(1) + '%';
             },
           },
@@ -628,7 +637,13 @@ const SentimentAnalysis = ({ clientId }: { clientId: number }) => {
   );
 };
 
-export default function ClientPage({ params }: { params: { id: string } }) {
+export default function ClientPage({
+  params,
+  searchParams
+}: {
+  params: PageParams;
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const router = useRouter();
   const [client, setClient] = useState<ClientDetails | null>(null);
   const [error, setError] = useState('');
@@ -636,16 +651,7 @@ export default function ClientPage({ params }: { params: { id: string } }) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/auth/login');
-    } else {
-      fetchClientDetails();
-      fetchClientNotes();
-    }
-  }, [params.id, router]);
-
-  const fetchClientDetails = async () => {
+  const fetchClientDetails = useCallback(async () => {
     try {
       const response = await fetch(`https://backend.doxcert.com/api/clients/careclients/${params.id}/`, {
         headers: {
@@ -665,9 +671,9 @@ export default function ClientPage({ params }: { params: { id: string } }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id]);
 
-  const fetchClientNotes = async () => {
+  const fetchClientNotes = useCallback(async () => {
     try {
       const response = await fetch(`https://backend.doxcert.com/api/clients/client-notes/${params.id}/notes/`, {
         headers: {
@@ -684,7 +690,16 @@ export default function ClientPage({ params }: { params: { id: string } }) {
     } catch (err) {
       console.error('Error fetching client notes:', err);
     }
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.push('/auth/login');
+    } else {
+      fetchClientDetails();
+      fetchClientNotes();
+    }
+  }, [router, fetchClientDetails, fetchClientNotes]);
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {

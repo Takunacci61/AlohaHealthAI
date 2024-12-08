@@ -84,7 +84,7 @@ export default function DashboardPage() {
     const pageNumbers = [];
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -271,7 +271,7 @@ export default function DashboardPage() {
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">No clients found</h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Try adjusting your search or filter to find what you're looking for.
+                  Try adjusting your search or filter to find what you&apos;re looking for.
                 </p>
               </div>
             )}

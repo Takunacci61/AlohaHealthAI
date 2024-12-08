@@ -8,7 +8,7 @@ interface Note {
   created_at: string;
   note_text: string;
   sentiment: string;
-  emotion_tags: Record<string, any>;
+  emotion_tags: Record<string, number>;
   ai_evaluated_notes: string;
   care_client: number;
   created_by: number;

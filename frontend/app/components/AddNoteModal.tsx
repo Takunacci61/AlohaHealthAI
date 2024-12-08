@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import{ getCurrentUserId } from '@/services/auth';
 import toast from 'react-hot-toast';
 
@@ -17,13 +17,13 @@ export default function AddNoteModal({ isOpen, onClose, clientId, onSuccess }: A
   const [noteText, setNoteText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [spellingErrors, setSpellingErrors] = useState([]);
+  const [spellingErrors] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (spellingErrors.length > 0) {
-      const toastId = toast((t: ToastType) => (
+      toast((t: ToastType) => (
         <div className="flex items-start">
           <div className="flex-shrink-0 pt-0.5">
             <svg className="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -36,7 +36,6 @@ export default function AddNoteModal({ isOpen, onClose, clientId, onSuccess }: A
             <div className="mt-3 flex space-x-2">
               <button
                 onClick={() => {
-                  toast.dismiss(t.id);
                   handleSubmitWithSpellingErrors();
                 }}
                 className="rounded-md bg-amber-100 px-3 py-2 text-sm font-semibold text-amber-600 hover:bg-amber-200"

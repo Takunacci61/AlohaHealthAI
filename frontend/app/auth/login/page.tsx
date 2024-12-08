@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { login } from '@/services/auth';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -21,8 +20,10 @@ export default function LoginPage() {
     try {
       await login({ username, password });
       router.push('/dashboard');
-    } catch (err) {
-      setError('Invalid credentials. Please try again.');
+    } catch (error: unknown) {
+      const err = error as Error;
+      console.error('Login error:', err.message);
+      setError('Invalid credentials');
     } finally {
       setIsLoading(false);
     }
