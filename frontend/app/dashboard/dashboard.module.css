@@ -1,0 +1,17 @@
+.container {
+  padding: 2rem;
+}
+
+.logoutButton {
+  padding: 0.5rem 1rem;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logoutButton:hover {
+  background-color: #b91c1c;
+} 
