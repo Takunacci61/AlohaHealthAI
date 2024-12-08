@@ -1,4 +1,4 @@
-# Remote Care
+# Lōkahi Healthcare Accelerator (Remote Care)
 
 **Smarter Insights. Healthier, Safer Lives.**
 
